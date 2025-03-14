@@ -44,6 +44,8 @@ function HandRecognizer({ setHandResults }: Props) {
 }
 
 export default HandRecognizer;
+
+
 async function initVideo(video: HTMLVideoElement) {
   const stream = await navigator.mediaDevices.getUserMedia({
     video: true,
