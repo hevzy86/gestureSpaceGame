@@ -5,6 +5,7 @@ import HandRecognizer from "@/components/HandRecognizer";
 import RocketComponent from "@/components/RocketComponent";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { playBackground, playFX } from "./utils/audiohandler";
 
 export default function Home() {
   const [rocket, setRocket] = useState<any>();
@@ -29,7 +30,7 @@ export default function Home() {
   const [livesRemainingState, setLivesRemainingState] = useState(4);
 
   useEffect(() => {
-    if (isDetected) {
+    if (isDetected && !isGameOver) {
       distanceInterval = setInterval(() => {
         setDistance((prev) => prev + 1);
       }, 100);
@@ -41,7 +42,7 @@ export default function Home() {
   }, [isDetected, isGameOver]);
 
   useEffect(() => {
-    if (isDetected) {
+    if (isDetected && !isGameOver) {
       generationInterval = setInterval(() => {
         setBoulders((prev) => {
           let retArr = [...prev];
@@ -73,7 +74,7 @@ export default function Home() {
       clearInterval(generationInterval);
       clearInterval(removalInterval);
     };
-  }, [isDetected]);
+  }, [isDetected, isGameOver]);
 
   useEffect(() => {
     setrocketLeft(window.innerWidth / 2);
@@ -105,10 +106,12 @@ export default function Home() {
     }
   };
   const collisionHandler = () => {
-    if (!isInvincible) {
+    if (!isInvincible && !isGameOver) {
       console.log("!!Collision");
       setIsInvincible(true);
       setIsColliding(true);
+
+      playFX();
 
       setLivesRemainingState((prev) => {
         const newLives = prev - 1;
@@ -125,6 +128,15 @@ export default function Home() {
       }, 1500);
     }
   };
+
+  useEffect(() => {
+    if (isDetected && !isGameOver) {
+      playBackground(false);
+    } else {
+      playBackground(true);
+    }
+  }, [isDetected, isGameOver]);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div
