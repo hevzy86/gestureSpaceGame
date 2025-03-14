@@ -20,10 +20,13 @@ export default function Home() {
 
   const [isLoading, setisLoading] = useState(false);
   const [distance, setDistance] = useState(0);
+  const [isGameOver, setIsGameOver] = useState(false);
 
   let generationInterval: any;
   let removalInterval: any;
   let distanceInterval: any;
+
+  const [livesRemainingState, setLivesRemainingState] = useState(4);
 
   useEffect(() => {
     if (isDetected) {
@@ -35,7 +38,7 @@ export default function Home() {
         clearInterval(distanceInterval);
       };
     }
-  }, [isDetected]);
+  }, [isDetected, isGameOver]);
 
   useEffect(() => {
     if (isDetected) {
@@ -106,9 +109,16 @@ export default function Home() {
       console.log("!!Collision");
       setIsInvincible(true);
       setIsColliding(true);
-      console.log("Collision" + isColliding);
 
-      // setScore((prev) => prev - 10); // Decrease score on collision
+      setLivesRemainingState((prev) => {
+        const newLives = prev - 1;
+        console.log("Lives remaining: " + newLives);
+        if (newLives <= 0) {
+          setIsGameOver(true);
+        }
+        return newLives;
+      });
+
       setTimeout(() => {
         setIsInvincible(false);
         setIsColliding(false);
@@ -152,7 +162,14 @@ export default function Home() {
         ))}
       </div>
       <GamelnfoOverlay
-        info={{ isLoading, isDetected, isColliding, distance }}
+        info={{
+          isLoading,
+          isDetected,
+          isColliding,
+          distance,
+          isGameOver,
+          livesRemainingState,
+        }}
       />
     </main>
   );
