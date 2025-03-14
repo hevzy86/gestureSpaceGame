@@ -12,12 +12,17 @@ export default function Home() {
   const [isDetected, setIsDetected] = useState(false);
   const [degrees, setdegrees] = useState(0);
   const [boulders, setBoulders] = useState<any[]>([]);
+
+  const [detectCollisionTrigger, setDetectCollisionTrigger] =
+    useState<number>(0);
+
   let generationInterval: any;
   let removalInterval: any;
+  let isInvincible = false;
 
   useEffect(() => {
     if (isDetected) {
-       generationInterval = setInterval(() => {
+      generationInterval = setInterval(() => {
         setBoulders((prev) => {
           let retArr = [...prev];
           for (let i = 0; i < 4; i++) {
@@ -59,6 +64,7 @@ export default function Home() {
     setdegrees(result.degrees);
 
     if (result.degrees && result.degrees !== 0) {
+      setDetectCollisionTrigger(Math.random());
       setrocketLeft((prev) => {
         // console.log(rocketLeft);
         // console.log(degrees);
@@ -75,10 +81,19 @@ export default function Home() {
 
         return returnValue;
       });
-      setRocket((rocketRef.current as any ).getBoundingClientRect());
+      setRocket((rocketRef.current as any).getBoundingClientRect());
     }
   };
-
+  const collisionHandler = () => {
+    // after collision
+    if (!isInvincible) {
+      console.log("!!Collision");
+      isInvincible = true;
+      setTimeout(() => {
+        isInvincible = false;
+      }, 2000);
+    }
+  };
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="absolute left-3 top-3 z-30 w-40">
@@ -103,6 +118,9 @@ export default function Home() {
           <BoulderComponent
             key={boulder.key}
             isMoving={isDetected}
+            what={rocket}
+            soWhat={collisionHandler}
+            when={detectCollisionTrigger}
           />
         ))}
       </div>
